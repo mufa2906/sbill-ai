@@ -18,7 +18,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     environment:
-      - NEXT_PUBLIC_API_URL=http://nginx/api
+      - BACKEND_URL=http://backend-api:3001
     networks:
       - app-network
     restart: unless-stopped
