@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# env secrets — JANGAN PERNAH COMMIT
+.env
+.env.local
+.env.*.local
+
+# build output
+dist/
+.next/
+out/
+build/
+
+# docker volumes
+postgres_data/
+redis_data/
+uploads/
+
+# typescript
+*.tsbuildinfo
+
+# logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/

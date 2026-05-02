@@ -1,0 +1,10 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Force binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.gif binary

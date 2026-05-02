@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  bills        Bill[]
+  participants Participant[]
+
+  @@map("users")
+}
+
+model Bill {
+  id                   String   @id @default(uuid())
+  ownerId              String   @map("owner_id")
+  title                String?
+  subtotal             BigInt   @default(0)
+  taxAmount            BigInt   @default(0) @map("tax_amount")
+  serviceChargeAmount  BigInt   @default(0) @map("service_charge_amount")
+  total                BigInt   @default(0)
+  state                String
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  owner        User          @relation(fields: [ownerId], references: [id])
+  items        BillItem[]
+  participants Participant[]
+  ocrJobs      OcrJob[]
+
+  @@map("bills")
+}
+
+model BillItem {
+  id             String   @id @default(uuid())
+  billId         String   @map("bill_id")
+  name           String
+  quantity       Int      @default(1)
+  price          BigInt
+  normalizedName String?  @map("normalized_name")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  bill        Bill             @relation(fields: [billId], references: [id], onDelete: Cascade)
+  assignments ItemAssignment[]
+
+  @@map("bill_items")
+}
+
+model Participant {
+  id        String   @id @default(uuid())
+  billId    String   @map("bill_id")
+  userId    String?  @map("user_id")
+  guestName String?  @map("guest_name")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  bill        Bill             @relation(fields: [billId], references: [id], onDelete: Cascade)
+  user        User?            @relation(fields: [userId], references: [id])
+  assignments ItemAssignment[]
+
+  @@map("participants")
+}
+
+model ItemAssignment {
+  id            String  @id @default(uuid())
+  itemId        String  @map("item_id")
+  participantId String  @map("participant_id")
+  ratio         Decimal @db.Decimal(5, 2)
+
+  item        BillItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  participant Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@map("item_assignments")
+}
+
+model OcrJob {
+  id              String   @id @default(uuid())
+  billId          String   @map("bill_id")
+  status          String
+  confidenceScore Int?     @map("confidence_score")
+  rawResponse     Json?    @map("raw_response")
+  errorMessage    String?  @map("error_message")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  bill Bill @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@map("ocr_jobs")
+}
